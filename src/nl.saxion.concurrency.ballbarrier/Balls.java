@@ -69,13 +69,13 @@ public class Balls {
 
 		nap((int)(1*Math.random()));
 		new Ball(world, 50, 80, 5, 10, Color.red, "red1").start();
-		nap((int)(50*Math.random()));
+		nap((int)(1000*Math.random()));
 		new Ball(world, 70, 100, 8, 6, Color.blue, "blue2").start();
-		nap((int)(50*Math.random()));
+		nap((int)(1000*Math.random()));
 		new Ball(world, 150, 100, 9, 7, Color.green, "green3").start();
-		nap((int)(50*Math.random()));
+		nap((int)(1000*Math.random()));
 		new Ball(world, 200, 130, 3, 8, Color.black, "black3").start();
-		nap((int)(50*Math.random()));
+		nap((int)(1000*Math.random()));
 
 
     }

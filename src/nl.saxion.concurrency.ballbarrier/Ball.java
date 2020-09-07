@@ -36,15 +36,34 @@ public class Ball extends Thread {
 
     public void run() {
         while (true) {
-            move();
-            if (semaphore.availablePermits() == 0){
-                unfreeze();
+            int ypos2 = (world.getHeight() - (ypos + ballh));
+            int xpos2 = world.getWidth() - (xpos + ballh);
+            int diag = 10;
+            if (ypos2 != 0 && xpos2 != 0) {
+                diag = ypos2 / xpos2;
+            }
 
+            if (worldDiagional > diag) {
+                Balls.nap(250);
+                try {
+                    acquireMainSemaphore();
+                    semaphore1.acquire();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (semaphore.availablePermits() == 0) {
+                        System.out.println("TIME TO RELEASE");
+                        unRealese();
+                    }
+                    semaphore1.release();
+                }
+                Balls.nap(250);
+            } else {
+                move();
             }
         }
-
-
     }
+
 
     public void move() {
         if (xpos >= world.getWidth() - ballw || xpos <= 0) {
@@ -56,31 +75,25 @@ public class Ball extends Thread {
         }
 
 
-        int ypos2 = (world.getHeight()-(ypos+ballh));
-        int xpos2 = world.getWidth()-(xpos+ballh);
-        int diag =10;
-        if (ypos2!=0 && xpos2 !=0){ diag = ypos2/xpos2; }
 
-        if (worldDiagional>diag){
-            freeze();
-            try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else{
-            doMove();
-            Balls.nap(30);
-            world.repaint();
-        };
+        doMove();
+        Balls.nap(30);
+        world.repaint();
+    }
 
+    private void acquireMainSemaphore() {
+        Balls.nap(50);
+        try {
+            semaphore.acquire();
+            System.out.println(Thread.currentThread().getName() + " acquired a semaphore. The amount of semaphores left are: " + semaphore.availablePermits());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-
-
-
-
-
-
+    private static void unRealese(){
+        semaphore.release(5);
+        System.out.println(Thread.currentThread().getName() + " Time to release: " + semaphore.availablePermits());
     }
 
     //
@@ -89,25 +102,6 @@ public class Ball extends Thread {
     public synchronized void doMove() {
         xpos += xinc;
         ypos += yinc;
-
-    }
-
-    void unfreeze(){
-        semaphore.release(5);
-
-    }
-
-    void freeze() {
-        try {
-            semaphore.acquire();
-            System.out.println(Thread.currentThread().getName() + " acquired a semaphore. The amount of semaphores left are: " + semaphore.availablePermits());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        xinc = 0;
-        yinc = 0;
-
     }
 
 
